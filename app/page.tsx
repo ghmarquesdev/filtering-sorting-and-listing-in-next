@@ -10,8 +10,30 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import axios from 'axios';
 
-export default async function Component() {
+type ComponentProps = {
+  searchParams?: { 
+    search?: string, 
+    status?: string, 
+    sort?:string,
+    page?: string
+  }
+}
+
+export default async function Component({ searchParams }: ComponentProps) {
+  const response = await axios.get("https://apis.codante.io/api/orders-api/orders", {
+    params: {
+      search: searchParams?.search,
+      status: searchParams?.status,
+      sort: searchParams?.sort,
+      page: searchParams?.page
+    }
+  })
+
+  const orders = response.data.data
+  const links = response.data.meta.links
+
   return (
     <main className="container px-1 py-10 md:p-10">
       <Card>
@@ -26,9 +48,9 @@ export default async function Component() {
           </div>
         </CardHeader>
         <CardContent>
-          <OrdersTable />
+          <OrdersTable orders={orders} />
           <div className="mt-8">
-            <Pagination />
+            <Pagination links={links} />
           </div>
         </CardContent>
       </Card>
